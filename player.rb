@@ -16,5 +16,7 @@ class Player
     elsif input == 'q'
       exit
     end
+
+    return :nothing
   end
 end
