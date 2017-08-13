@@ -1,15 +1,15 @@
-require './player.rb'
-
 class Game
-
   attr_accessor :score, :map_size
-
   def initialize player
     @run = 0
     @map_size = 12
     @start_position = 3
     @player = player
     reset
+
+    # Clear the console
+    puts "\e[H\e[2J"
+
   end
 
   def reset
@@ -18,16 +18,25 @@ class Game
     @pit_x = 0
     @score = 0
     @run += 1
+    @moves = 0
   end
 
   def run
-    # Clear the console
-    puts "\e[H\e[2J"
-
-    while @score < 10
+    while @score < 5 && @score > -5
       draw
       gameloop
+      @moves += 1
     end
+
+    # Draw one last time to update the
+    draw
+
+    if @score >= 5
+      puts "  You win in #{@moves} moves!"
+    else
+      puts "  Game over"
+    end
+
   end
 
   def gameloop
