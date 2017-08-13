@@ -15,4 +15,4 @@ To run the game and let the AI play run:
 $ ruby run-q.rb
 ```
 
-For more information about how this is implemented see [http://www.practicalai.io/teaching-ai-play-simple-game-using-q-learning/](Teaching an AI to play a simple game using q-learning).
+For more information about how this is implemented see [Teaching an AI to play a simple game using q-learning](http://www.practicalai.io/teaching-ai-play-simple-game-using-q-learning/).
