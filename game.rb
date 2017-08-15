@@ -44,7 +44,7 @@ class Game
     if move == :left
       @player.x = @player.x > 0 ? @player.x-1 : @map_size-1;
     elsif move == :right
-      @player.x = @player.x < @map_size ? @player.x+1 : 0;
+      @player.x = @player.x < @map_size-1 ? @player.x+1 : 0;
     end
 
     if @player.x == @cheese_x
