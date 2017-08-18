@@ -1,9 +1,9 @@
 class Game
   attr_accessor :score, :map_size
   def initialize player
+    initialize_start_position
     @run = 0
     @map_size = 12
-    @start_position = 3
     @player = player
     reset
 
@@ -13,12 +13,32 @@ class Game
   end
 
   def reset
-    @player.x = @start_position
-    @cheese_x = 10
-    @pit_x = 0
     @score = 0
     @run += 1
     @moves = 0
+    generate_start_positions
+  end
+
+  def initialize_start_position
+    @start_position = 0
+    @cheese_x = 0
+    @pit_x = 0
+  end
+
+  def generate_start_positions
+    while @start_position == @cheese_x || @start_position == @pit_x
+      @start_position = rand(@map_size - 1)
+    end
+
+    @cheese_x = @start_position
+    while @cheese_x == @start_position || @cheese_x == @pit_x
+      @cheese_x = rand(@map_size - 1)
+    end
+
+    @pit_x = @start_position
+    while @pit_x == @start_position || @pit_x == @cheese_x
+      @pit_x = rand(@map_size - 1)
+    end
   end
 
   def run
@@ -37,6 +57,7 @@ class Game
       puts "  Game over"
     end
 
+    initialize_start_position
   end
 
   def gameloop
@@ -44,7 +65,7 @@ class Game
     if move == :left
       @player.x = @player.x > 0 ? @player.x-1 : @map_size-1;
     elsif move == :right
-      @player.x = @player.x < @map_size ? @player.x+1 : 0;
+      @player.x = @player.x < @map_size-1 ? @player.x+1 : 0;
     end
 
     if @player.x == @cheese_x
