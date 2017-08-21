@@ -62,16 +62,16 @@ class Game
     # Compute map line
     map_line = @map_size.times.map do |i|
       if @player.x == i
-        'P'
+        @player.to_s
       elsif @cheese_x == i
-        'C'
+        '🧀'
       elsif @pit_x == i
-        'O'
+        '💀'
       else
-        '='
+        '-'
       end
     end
-    map_line = "\r##{map_line.join}# | Score #{@score} | Run #{@run}"
+    map_line = "\r#{map_line.join} | Score #{@score} | Run #{@run}"
 
     # Draw to console
     # use printf because we want to update the line rather than print a new one

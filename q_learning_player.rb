@@ -13,6 +13,10 @@ class QLearningPlayer
     @r = Random.new
   end
 
+  def to_s
+    '🤖'
+  end
+
   def initialize_q_table
     # Initialize q_table states by actions
     @q_table = Array.new(@game.map_size){ Array.new(@actions.length) }

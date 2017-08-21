@@ -7,6 +7,10 @@ class Player
     @x = 0
   end
 
+  def to_s
+    '😃'
+  end
+
   def get_input
     input = STDIN.getch
     if input == 'a'
