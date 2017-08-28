@@ -1,10 +1,11 @@
 require 'io/console'
 
 class Player
-  attr_accessor :x
+  attr_accessor :x, :y
 
   def initialize
     @x = 0
+    @y = 0
   end
 
   def get_input
@@ -13,6 +14,10 @@ class Player
       return :left
     elsif input == 'd'
       return :right
+    elsif input == 'w'
+      return :up
+    elsif input == 's'
+      return :down
     elsif input == 'q'
       exit
     end
