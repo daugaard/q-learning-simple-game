@@ -3,6 +3,8 @@ This example will show how we can teach an AI to play a simple game using the Q-
 
 This is implemented in pure Ruby without any external dependencies.
 
+The 2D branch has exapanded the game to be two dimensional and have random cheese placements. 
+
 To run the game and play a human run:
 
 ```
