@@ -26,8 +26,8 @@ class QLearningPlayer
 
   def initialize_q_neural_network
     # Setup model
-    # Input is the size of the map
-    # Output is the size of all actions
+    # Input is the size of the map + number of actions
+    # Output size is one
     @q_nn_model = RubyFann::Standard.new(
                   num_inputs: @game.map_size_x*@game.map_size_y + @actions.length,
                   hidden_neurons: [ (@game.map_size_x*@game.map_size_y+@actions.length) ],
@@ -42,7 +42,7 @@ class QLearningPlayer
 
   def get_input
     # Pause to make sure humans can follow along
-    # Increase pause with the rumber of runs
+    # Increase pause with the number of runs
     sleep 0.05 + 0.01*(@runs/400.0)
     @runs += 1
 
@@ -132,7 +132,7 @@ class QLearningPlayer
       @action_taken_index = q_table_row.each_with_index.max[1]
     end
 
-    # Save current state, score and q table row
+    # Save score and current state
     @old_score = @game.score
 
     # Set action taken in input state before storing it
