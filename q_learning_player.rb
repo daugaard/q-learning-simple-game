@@ -45,7 +45,6 @@ class QLearningPlayer
     # Increase pause with the rumber of runs
     sleep 0.05 + 0.01*(@runs/400.0)
     @runs += 1
-    puts "Runs: #{@runs}"
 
     if @first_run
       # If this is first run initialize the Q-neural network
