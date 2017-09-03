@@ -68,8 +68,8 @@ class QLearningPlayer
       input_state = Array.new(@game.map_size_x*@game.map_size_y + @actions.length, 0)
       input_state[@x + (@game.map_size_x*@y)] = 1
 
-      # Add to old_q_value_for_action, reward, old_state and input state to memory
-      @replay_memory[@replay_memory_pointer] = {old_q_value_for_action: @old_q_value_for_action, reward: r, old_input_state: @old_input_state, input_state: input_state}
+      # Add reward, old_state and input state to memory
+      @replay_memory[@replay_memory_pointer] = {reward: r, old_input_state: @old_input_state, input_state: input_state}
 
       # Increment memory pointer
       @replay_memory_pointer = (@replay_memory_pointer<@replay_memory_size) ? @replay_memory_pointer+1 : 0
@@ -143,8 +143,7 @@ class QLearningPlayer
     # Set action taken in input state before storing it
     input_state[(@game.map_size_x*@game.map_size_y) + @action_taken_index] = 1
     @old_input_state = input_state
-    @old_q_value_for_action = q_table_row[@action_taken_index]
-
+    
     # Take action
     return @actions[@action_taken_index]
   end
