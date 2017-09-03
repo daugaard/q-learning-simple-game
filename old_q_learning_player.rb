@@ -9,15 +9,15 @@ class QLearningPlayer
     @actions = [:left, :right, :up, :down]
     @first_run = true
 
-    @discount = 0.9
+    @discount = 0.7
     @epsilon = 0.1
     @max_epsilon = 0.9
     @epsilon_increase_factor = 1000.0
 
-    @replay_memory_size = 500
+    @replay_memory_size = 100
     @replay_memory_pointer = 0
     @replay_memory = []
-    @replay_batch_size = 400
+    @replay_batch_size = 50
 
     @runs = 0
 
@@ -42,10 +42,8 @@ class QLearningPlayer
 
   def get_input
     # Pause to make sure humans can follow along
-    # Increase pause with the rumber of runs
-    sleep 0.05 + 0.01*(@runs/100.0)
+    sleep 0.05 + 0.01*(@runs/500.0)
     @runs += 1
-    puts "Runs: #{@runs}"
 
     if @first_run
       # If this is first run initialize the Q-neural network
@@ -53,8 +51,8 @@ class QLearningPlayer
       @first_run = false
     else
       # If this is not the first run
-
-      # Evaluate what happened on last action and calculate reward
+      # Evaluate what happened on last action and update Q table
+      # Calculate reward
       r = 0 # default is 0
       if !@game.new_game and @old_score < @game.score
         r = 1 # reward is 1 if our score increased
@@ -64,31 +62,27 @@ class QLearningPlayer
         r = -0.1
       end
 
-      # Capture current state
-      # Set input to network map_size_x * map_size_y + actions length vector with a 1 on the player position
-      input_state = Array.new(@game.map_size_x*@game.map_size_y + @actions.length, 0)
-      input_state[@x + (@game.map_size_x*@y)] = 1
-
-      # Add to old_q_value_for_action, reward, old_state and input state to memory
-      @replay_memory[@replay_memory_pointer] = {old_q_value_for_action: @old_q_value_for_action, reward: r, old_input_state: @old_input_state, input_state: input_state}
-
-      # Increment memory pointer
-      @replay_memory_pointer = (@replay_memory_pointer<@replay_memory_size) ? @replay_memory_pointer+1 : 0
-
-      # If replay memory is full train network on a batch of states from the memory
-      if @replay_memory.length > @replay_memory_size
-        # Randomly samply a batch of actions from the memory and train network with these actions
+      # If replay memory is not full add old state, reward and new state to replay memory
+      if @replay_memory_pointer < @replay_memory_size
+        # Add to memory
+        @replay_memory[@replay_memory_pointer] = {old_q_value_for_action: @old_q_value_for_action, reward: r, old_input_state: @old_input_state, input_state: input_state}
+        # Increment memory pointer
+        @replay_memory_pointer += 1
+      else
+        # If memory is full randomly samply a batch of actions from the memory and train network with these actions
         @batch = @replay_memory.sample(@replay_batch_size)
-        training_x_data = []
-        training_y_data = []
 
-        # For each batch calculate new q_value based on current network and reward
+        x_data = []
+        y_data []
+
+        # For each batch calculate new
         @batch.each do |m|
+          input_state = m[:input_state]
           # To get entire q table row of the current state run the network once for every posible action
           q_table_row = []
           @actions.length.times do |a|
             # Create neural network input vector for this action
-            input_state_action = m[:input_state].clone
+            input_state_action = input_state.clone
             # Set a 1 in the action location of the input vector
             input_state_action[(@game.map_size_x*@game.map_size_y) + a] = 1
             # Run the network for this action and get q table row entry
@@ -99,15 +93,40 @@ class QLearningPlayer
           updated_q_value = m[:reward] + @discount * q_table_row.max
 
           # Add to training set
-          training_x_data.push(m[:old_input_state])
-          training_y_data.push([updated_q_value])
+          x_data.push(m[:old_input_state])
+          y_data.push([updated_q_value])
         end
 
-        # Train network with batch
-        train = RubyFann::TrainData.new( :inputs=> training_x_data, :desired_outputs=>training_y_data );
-        @q_nn_model.train_on_data(train, 1, 1, 0.01)
+        # traing network 
 
       end
+
+      # Run prediction on the outcome state to get q_table_row for this state
+      # Create network input vector represeting the current state after action was taken
+      # Set input to network map_size_x * map_size_y vector + @actions.length
+      input_state = Array.new(@game.map_size_x*@game.map_size_y + @actions.length, 0)
+      #Set a 1 on the player position
+      input_state[@x + (@game.map_size_x*@y)] = 1
+
+      # To get the entire q table row of the current state run the network once for every posible action
+      q_table_row = []
+      @actions.length.times do |a|
+        # Create neural network input vector for this action
+        input_state_action = input_state.clone
+        # Set a 1 in the action location of the input vector
+        input_state_action[(@game.map_size_x*@game.map_size_y) + a] = 1
+        # Run the network for this action and get q table row entry
+        q_table_row[a] = @q_nn_model.run(input_state_action).first
+      end
+
+      puts "#{q_table_row}"
+      # Update the old q value
+      @old_q_value_for_action = r + @discount * q_table_row.max
+      puts @old_q_value_for_action
+
+      # Train the neural network with the updated q-table entry
+      @q_nn_model.train(@old_input_state, [@old_q_value_for_action])
+
     end
 
     # Capture current state and score
@@ -128,11 +147,12 @@ class QLearningPlayer
 
     # Chose action based on Q value estimates for state
     # If a random number is higher than epsilon we take a random action
-    # We will slowly increase @epsilon based on runs to a maximum of @max_epsilon - this encourages early exploration
+    # We will slowly increase @epsilon based on runs to a maximum of 0.9
     epsilon_run_factor = (@runs/@epsilon_increase_factor) > (@max_epsilon-@epsilon) ? (@max_epsilon-@epsilon) : (@runs/@epsilon_increase_factor)
     if @r.rand > (@epsilon + epsilon_run_factor)
       # Select random action
       @action_taken_index = @r.rand(@actions.length)
+      puts "RANDOM e = #{@epsilon + epsilon_run_factor}"
     else
       # Select action with highest posible reward
       @action_taken_index = q_table_row.each_with_index.max[1]

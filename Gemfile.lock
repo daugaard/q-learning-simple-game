@@ -1,0 +1,13 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    ruby-fann (1.2.6)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  ruby-fann
+
+BUNDLED WITH
+   1.15.4

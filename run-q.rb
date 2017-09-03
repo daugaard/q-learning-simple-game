@@ -10,5 +10,4 @@ p.game = g
   g.reset
 end
 
-p.print_table
 puts ""
