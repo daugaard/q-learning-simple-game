@@ -12,7 +12,7 @@ class QLearningPlayer
     @discount = 0.9
     @epsilon = 0.1
     @max_epsilon = 0.9
-    @epsilon_increase_factor = 1000.0
+    @epsilon_increase_factor = 800.0
 
     @replay_memory_size = 500
     @replay_memory_pointer = 0
@@ -43,7 +43,7 @@ class QLearningPlayer
   def get_input
     # Pause to make sure humans can follow along
     # Increase pause with the rumber of runs
-    sleep 0.05 + 0.01*(@runs/100.0)
+    sleep 0.05 + 0.01*(@runs/400.0)
     @runs += 1
     puts "Runs: #{@runs}"
 

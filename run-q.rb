@@ -5,7 +5,7 @@ p = QLearningPlayer.new
 g = Game.new( p )
 p.game = g
 
-100.times do
+3.times do
   g.run
   g.reset
 end
